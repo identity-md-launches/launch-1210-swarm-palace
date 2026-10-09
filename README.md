@@ -14,7 +14,9 @@ The interface comprises `name`, `symbol`, `decimals`, `totalSupply`, `balanceOf`
 
 `launch.json` contains the task's exact launch settings. The target is Ethereum mainnet; no chain ID is added to the manifest. The pair is IMD at `0xd34a99bc0f67ae1bbd63c660e6d0b0dd03e263b7`, fee 12500 and tick spacing 60. The PoolManager is `0x000000000004444c5dc75cB358380D2e3dE08A90`.
 
-The factory receives the full supply, forwards the swarm's 10% through its Merkle distributor, seeds the pool from its own balance under `poolBps: 9000`, and sends any remainder to the explicitly requested `0x000000000000000000000000000000000000dead`. The opening market cap is 2500 IMD (`2500000000000000000000` minor units). The manifest's `initialPrice` is provenance only; the network derives the actual opening price using the deployed token ordering and economics.
+The factory receives the full supply, forwards the swarm's 10% (100,000,000 SPALACE) through its Merkle distributor, seeds the pool from its own balance under `poolBps: 9000` (a 900,000,000 SPALACE allocation), and sends any remainder to the explicitly requested `0x000000000000000000000000000000000000dead`. The opening market cap is 2500 IMD (`2500000000000000000000` minor units). The manifest's `initialPrice: "125270724187523965593206900"` is provenance only, expressed as sqrtPriceX96 with SPALACE as currency0; the network derives the actual opening price using the deployed token ordering and economics.
+
+There are no constructor arguments or post-launch token settings. The launch operator handles deployment, pool initialization, liquidity settlement, Merkle distribution and forwarding any rounding remainder. Those operations belong to the external launch infrastructure; the token itself only mints to its constructor caller and implements ordinary ERC-20 accounting.
 
 The network deployer handles production deployment through `ProjectFactory.launchCustom` after review. This repository reads no credentials, broadcasts no transactions and has no requester address to configure. `script/Deploy.s.sol` is a standalone simulation helper, not the factory launch workflow. For the operator to simulate its construction offline:
 
@@ -26,7 +28,15 @@ The script defaults to a chain ID guard of 1; zero is an explicit local simulati
 
 ## Offline checks
 
-Foundry 1.8.3 and a cached solc 0.8.26 are required. All Solidity imports are repository-local; there are no packages, submodules or network dependencies. Compiler settings pin Cancun, optimizer 200 runs, metadata bytecode hash disabled, offline mode, FFI disabled and no filesystem permissions.
+Use Foundry with solc 0.8.26 installed before running offline. All Solidity imports are repository-local; there are no packages, submodules or network dependencies. Compiler settings pin Cancun, optimizer 200 runs, metadata bytecode hash disabled, offline mode, FFI disabled and no filesystem permissions.
+
+For a quick smoke check covering deployment, the full supply and mint event, ordinary transfers and approvals, and an overdraw failure:
+
+```sh
+forge test --match-contract SPALACETokenTest --match-test 'test_(LaunchIdentityAndWholeSupplyToConstructorCaller|ConstructorEmitsWholeSupplyMintToFactory|TransferAndApprovalEvents|ZeroValueTransfersEmitEvents|InsufficientBalanceRollsBack)'
+```
+
+For the complete existing suite and consistency checks:
 
 ```sh
 forge build --offline

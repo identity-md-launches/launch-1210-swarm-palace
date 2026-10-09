@@ -29,3 +29,9 @@ The pinned protected test source was read. It depends on network-provided launch
 Removed only the five redundant 1254 × 1254 originals from `artifacts/generated/`, saving 7,895,274 bytes. All five required 1024 × 1024 logo options, the selected `artifacts/logo.png`, preview proofs, source, tests and ABI remain. SHA-256 checks against the existing asset report confirmed that every deliverable PNG is unchanged. Updated both READMEs to describe the retained exports accurately. The remaining source files total approximately 7.26 MiB, below the 8 MiB upload limit even before archive compression.
 
 After removal, reran the offline build, all 21 tests with both a fresh seed and `0x5350414c414345`, formatting and its check, the offline deployment simulation, and both Python checkers; all passed. Reinspected the 64-pixel options and selected 32-pixel circular proof. No additional artwork was generated; the original five designs are all retained as exports.
+
+## Launch smoke handoff
+
+The token, exact launch manifest and protected build configuration already satisfy this assignment and were preserved. Added two deterministic checks for the full-supply constructor mint event and zero-value transfer events. The README now includes a five-test smoke command, the exact provenance price, allocation amounts and the launch operator's responsibilities. No new fuzz or invariant tests were added.
+
+Checked with Foundry 1.8.5 and pinned solc 0.8.26: `forge build`, the documented five-test smoke command, `forge test` (23 passed, zero failures or skips), `forge fmt --check` and `python3 scripts/check_manifest.py` all passed. The existing fuzz and invariant tests were included in the full run. The manifest and exported ABI match; token runtime remains 1,315 bytes. The protected launch harness was read, but its external infrastructure and environment were not available in this project, so this run does not claim pool integration or independent attestation.

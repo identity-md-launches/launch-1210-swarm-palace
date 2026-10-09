@@ -6,6 +6,7 @@ import {SPALACEToken} from "../src/SPALACEToken.sol";
 interface TestVm {
     function prank(address caller) external;
     function expectRevert(bytes calldata data) external;
+    function expectEmit(bool topic1, bool topic2, bool topic3, bool data) external;
     function expectEmit(bool topic1, bool topic2, bool topic3, bool data, address emitter) external;
 }
 
@@ -46,6 +47,15 @@ contract SPALACETokenTest {
         require(token.balanceOf(address(0)) == 0, "no zero allocation");
     }
 
+    function test_ConstructorEmitsWholeSupplyMintToFactory() public {
+        TokenFactoryProbe factory = new TokenFactoryProbe();
+        vm.expectEmit(true, true, false, true);
+        emit Transfer(address(0), address(factory), SUPPLY);
+        SPALACEToken launched = factory.deploy();
+        require(launched.totalSupply() == SUPPLY, "mint matches declared supply");
+        require(launched.balanceOf(address(factory)) == SUPPLY, "factory receives all minted units");
+    }
+
     function test_FactoryReceivesFullSupplyAndControlsDistribution() public {
         TokenFactoryProbe factory = new TokenFactoryProbe();
         SPALACEToken launched = factory.deploy();
@@ -78,6 +88,22 @@ contract SPALACETokenTest {
         emit Transfer(address(this), BOB, 2);
         vm.prank(SPENDER);
         require(token.transferFrom(address(this), BOB, 2));
+    }
+
+    function test_ZeroValueTransfersEmitEvents() public {
+        vm.expectEmit(true, true, false, true, address(token));
+        emit Transfer(ALICE, BOB, 0);
+        vm.prank(ALICE);
+        require(token.transfer(BOB, 0));
+
+        vm.expectEmit(true, true, false, true, address(token));
+        emit Transfer(ALICE, BOB, 0);
+        vm.prank(SPENDER);
+        require(token.transferFrom(ALICE, BOB, 0));
+
+        require(token.balanceOf(address(this)) == SUPPLY, "zero transfers preserve allocation");
+        require(token.balanceOf(ALICE) == 0 && token.balanceOf(BOB) == 0, "zero transfers create no balance");
+        require(token.allowance(ALICE, SPENDER) == 0, "zero transfer needs no allowance");
     }
 
     function test_ZeroTransfersAndEntireBalance() public {
