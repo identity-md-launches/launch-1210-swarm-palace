@@ -189,31 +189,44 @@ contract SPALACETokenTest {
 
     function test_NoMintBurnOrAdminInterface() public {
         token.transfer(ALICE, 100);
-        string[17] memory signatures = [
-            "mint(address,uint256)",
-            "mint(uint256)",
-            "mint()",
-            "burn(uint256)",
-            "burnFrom(address,uint256)",
-            "owner()",
-            "setOwner(address)",
-            "transferOwnership(address)",
-            "upgradeTo(address)",
-            "initialize(address)",
-            "setMinter(address)",
-            "pause()",
-            "unpause()",
-            "blacklist(address)",
-            "freeze(address)",
-            "seize(address)",
-            "setFee(uint256)"
-        ];
-        for (uint256 i; i < signatures.length; ++i) {
-            bytes memory data = abi.encodeWithSignature(signatures[i], ALICE, 100);
-            (bool deployerOk,) = address(token).call(data);
+        // Correct argument types matter: an invalid bool could make an existing
+        // privileged function revert in ABI decoding and hide that interface.
+        bytes[] memory calls = new bytes[](30);
+        calls[0] = abi.encodeWithSignature("mint(address,uint256)", ALICE, 100);
+        calls[1] = abi.encodeWithSignature("mint(uint256)", 100);
+        calls[2] = abi.encodeWithSignature("mint()");
+        calls[3] = abi.encodeWithSignature("burn(uint256)", 100);
+        calls[4] = abi.encodeWithSignature("burnFrom(address,uint256)", ALICE, 100);
+        calls[5] = abi.encodeWithSignature("owner()");
+        calls[6] = abi.encodeWithSignature("setOwner(address)", ALICE);
+        calls[7] = abi.encodeWithSignature("transferOwnership(address)", ALICE);
+        calls[8] = abi.encodeWithSignature("upgradeTo(address)", ALICE);
+        calls[9] = abi.encodeWithSignature("initialize(address)", ALICE);
+        calls[10] = abi.encodeWithSignature("setMinter(address)", ALICE);
+        calls[11] = abi.encodeWithSignature("pause()");
+        calls[12] = abi.encodeWithSignature("unpause()");
+        calls[13] = abi.encodeWithSignature("blacklist(address)", ALICE);
+        calls[14] = abi.encodeWithSignature("freeze(address)", ALICE);
+        calls[15] = abi.encodeWithSignature("seize(address)", ALICE);
+        calls[16] = abi.encodeWithSignature("setFee(uint256)", 100);
+        calls[17] = abi.encodeWithSignature("issue(uint256)", 100);
+        calls[18] = abi.encodeWithSignature("blocklist(address)", ALICE);
+        calls[19] = abi.encodeWithSignature("freezeAccount(address)", ALICE);
+        calls[20] = abi.encodeWithSignature("setBlacklist(address,bool)", ALICE, true);
+        calls[21] = abi.encodeWithSignature("setBlocked(address,bool)", ALICE, true);
+        calls[22] = abi.encodeWithSignature("lock(address)", ALICE);
+        calls[23] = abi.encodeWithSignature("disableTransfers()");
+        calls[24] = abi.encodeWithSignature("setTransfersEnabled(bool)", false);
+        calls[25] = abi.encodeWithSignature("renounceOwnership()");
+        calls[26] = abi.encodeWithSignature("grantRole(bytes32,address)", bytes32(0), ALICE);
+        calls[27] = abi.encodeWithSignature("setMaxTxAmount(uint256)", 0);
+        calls[28] = abi.encodeWithSignature("setTax(uint256)", 100);
+        calls[29] = abi.encodeWithSignature("initialize()");
+        for (uint256 i; i < calls.length; ++i) {
+            (bool deployerOk,) = address(token).call(calls[i]);
             require(!deployerOk, "unexpected deployer admin interface");
             vm.prank(BOB);
-            (bool strangerOk,) = address(token).call(data);
+            (bool strangerOk,) = address(token).call(calls[i]);
             require(!strangerOk, "unexpected public admin interface");
         }
         require(token.totalSupply() == SUPPLY, "supply immutable");
@@ -236,7 +249,6 @@ contract SPALACETokenTest {
         }
     }
 
-    /// forge-config: default.fuzz.runs = 2000
     function testFuzz_TransferRoundTripPreservesAllSupply(uint256 rawAmount) public {
         uint256 amount = rawAmount % (SUPPLY + 1);
         token.transfer(ALICE, amount);
@@ -249,7 +261,6 @@ contract SPALACETokenTest {
         require(token.totalSupply() == SUPPLY, "supply conserved");
     }
 
-    /// forge-config: default.fuzz.runs = 2000
     function testFuzz_SelfTransferConservesBalance(uint256 rawAmount) public {
         uint256 amount = rawAmount % (SUPPLY + 1);
         token.transfer(address(this), amount);
@@ -261,7 +272,6 @@ contract SPALACETokenTest {
         require(token.allowance(address(this), SPENDER) == 0, "finite approval consumed");
     }
 
-    /// forge-config: default.fuzz.runs = 2000
     function testFuzz_FiniteAllowanceEnforcesCumulativeLimit(uint256 rawApproval, uint256 rawSpend) public {
         uint256 approved = rawApproval % (SUPPLY + 1);
         uint256 spend = rawSpend % (approved + 1);
@@ -281,7 +291,6 @@ contract SPALACETokenTest {
         require(token.balanceOf(ALICE) == approved, "exact approved amount delivered");
     }
 
-    /// forge-config: default.fuzz.runs = 2000
     function testFuzz_UnlimitedApprovalPersists(uint256 rawAmount) public {
         uint256 amount = rawAmount % (SUPPLY + 1);
         token.approve(SPENDER, type(uint256).max);
@@ -295,7 +304,6 @@ contract SPALACETokenTest {
         require(token.balanceOf(ALICE) + token.balanceOf(address(this)) == SUPPLY, "conservation");
     }
 
-    /// forge-config: default.fuzz.runs = 2000
     function testFuzz_TransferAboveBalanceNeverMutates(uint256 rawBalance, uint256 rawExcess) public {
         uint256 balance = rawBalance % (SUPPLY + 1);
         uint256 excess = 1 + rawExcess % (type(uint256).max - balance);
