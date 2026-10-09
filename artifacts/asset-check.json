@@ -1,0 +1,61 @@
+{
+  "images": [
+    {
+      "path": "logos/logo-1.png",
+      "width": 1024,
+      "height": 1024,
+      "opaque": true,
+      "bytes": 1115477,
+      "sha256": "4f37f14517f59d4a54040bb92a82484a94858ef5329b92a2d930cf7a7c779e9a"
+    },
+    {
+      "path": "logos/logo-2.png",
+      "width": 1024,
+      "height": 1024,
+      "opaque": true,
+      "bytes": 756221,
+      "sha256": "652a60bde1bb319d3deb87b0e690e7cb6f05817b610f49955db84cd64b992d8d"
+    },
+    {
+      "path": "logos/logo-3.png",
+      "width": 1024,
+      "height": 1024,
+      "opaque": true,
+      "bytes": 1015543,
+      "sha256": "319e42f294904e3c41405bb5646b1cd2ca686795f603307c46ea149a1b593ab5"
+    },
+    {
+      "path": "logos/logo-4.png",
+      "width": 1024,
+      "height": 1024,
+      "opaque": true,
+      "bytes": 1992965,
+      "sha256": "ec79e80fc2c63d6352f6520021cc29851de010c70e1f68269275879f26c0a056"
+    },
+    {
+      "path": "logos/logo-5.png",
+      "width": 1024,
+      "height": 1024,
+      "opaque": true,
+      "bytes": 1476892,
+      "sha256": "eeda60fcdbb9fedca72dd00f054eda6d33e9a1d412e826e67101d680780d9e84"
+    },
+    {
+      "path": "artifacts/logo.png",
+      "width": 1024,
+      "height": 1024,
+      "opaque": true,
+      "bytes": 1115477,
+      "sha256": "4f37f14517f59d4a54040bb92a82484a94858ef5329b92a2d930cf7a7c779e9a"
+    }
+  ],
+  "generator": "built-in image generation (gpt-image)",
+  "draftsGenerated": 5,
+  "draftsDiscarded": 0,
+  "selectedOption": 1,
+  "export": "ffmpeg Lanczos resize from generated 1254x1254 to 1024x1024 RGB PNG",
+  "reviewProofs": [
+    "artifacts/previews/options-at-64.png",
+    "artifacts/previews/selected-at-32.png"
+  ]
+}

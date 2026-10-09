@@ -1,0 +1,24 @@
+{
+  "kind": "custom_token",
+  "token": {
+    "contract": "SPALACEToken",
+    "name": "Swarm Palace",
+    "symbol": "SPALACE",
+    "decimals": 18,
+    "constructorArgs": [],
+    "totalSupply": "1000000000000000000000000000"
+  },
+  "contracts": [],
+  "pool": {
+    "pairedCurrency": "0xd34a99bc0f67ae1bbd63c660e6d0b0dd03e263b7",
+    "fee": 12500,
+    "tickSpacing": 60,
+    "initialPrice": "125270724187523965593206900"
+  },
+  "economics": {
+    "poolBps": 9000,
+    "initialMarketCapWei": "2500000000000000000000",
+    "remainderTo": "0x000000000000000000000000000000000000dead"
+  },
+  "notes": "Fixed-supply, fee-free ERC-20: exactly 1e27 units are minted once to the constructor caller, with no owner, administrative functions, mint or burn interface. The Ethereum launch factory distributes the swarm's 10% through its Merkle distributor, seeds the pool from the deployer balance and forwards any remainder to remainderTo. Transfers to and from the PoolManager have ordinary ERC-20 semantics. The declared initialPrice is provenance only; the deployer derives the opening price from the economics and deployed currency ordering. Five generated logo approaches are in logos/; artifacts/logo.png selects the original crowned frog mascot."
+}
